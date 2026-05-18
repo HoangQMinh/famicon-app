@@ -1,0 +1,32 @@
+-- =============================================================================
+-- Migration: 20260517000005_make_invites_email_nullable.sql
+-- Description: Allow link-based invites without a target email address.
+--
+--              createLinkInvite() inserts into circle_invites with email = NULL.
+--              The current NOT NULL constraint on circle_invites.email rejects
+--              those rows at runtime. Dropping the constraint unblocks the
+--              link-based invite flow implemented in Sprint 2.
+--
+--              Index note: idx_invites_email uses a partial clause
+--              (WHERE status = 'pending'). PostgreSQL does not index NULL values
+--              in B-tree indexes, so NULL email rows are simply absent from the
+--              index — which is the correct behaviour for link-based invites
+--              that have no target email to look up. No index change is needed.
+--
+-- Author: Schema Agent
+-- Date: 2026-05-17
+-- Refs: Sprint 2 — createLinkInvite() Server Action
+-- =============================================================================
+-- ROLLBACK: see bottom of file
+-- =============================================================================
+
+-- Allow link-based invites without target email
+ALTER TABLE circle_invites ALTER COLUMN email DROP NOT NULL;
+
+-- =============================================================================
+-- ROLLBACK SQL
+-- WARNING: restoring NOT NULL will fail if any rows already have email = NULL.
+--          Run this only on a clean environment or after purging NULL-email rows.
+-- =============================================================================
+-- ALTER TABLE circle_invites ALTER COLUMN email SET NOT NULL;
+-- =============================================================================
