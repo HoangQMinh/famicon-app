@@ -102,5 +102,37 @@ Master Agent cập nhật file này sau mỗi phiên làm việc.
 
 ---
 
-*Last updated: 2026-05-20 — Sprint 9 DONE*
+## Nhóm: Root Cause — Bugs phát hiện qua device testing Sprint 9
+
+Phân tích gốc rễ 3 bugs bắt được lần đầu khi test trên device thật (không bắt được qua automated tests).
+
+| # | Bug | Root Cause | Pattern |
+|---|---|---|---|
+| RC-001 | Nút "Thử lại" offline.html không có tác dụng | `window.location.reload()` tải lại chính `/offline.html` thay vì quay về app. Khi OfflineDetector redirect đến `/offline.html`, URL đã thay đổi — reload chỉ load lại trang offline từ SW cache | Nhầm semantic: "thử lại kết nối" ≠ "tải lại trang hiện tại" |
+| RC-002 | Offline fallback không hiện trên discovery/create circle | SW chỉ intercept `mode === 'navigate'` (full page load). Next.js App Router dùng RSC client-side fetch (`mode: same-origin`, header `RSC: 1`) khi tap link trong app — không bị SW bắt, Next.js tự xử lý → error boundary thay vì offline.html | Mental model sai: assume "navigation = mode:navigate". Đúng với MPA, sai với Next.js App Router SPA |
+| RC-003 | Icon iOS Home Screen là hình vuông màu cam | Placeholder PNG được tạo để "pass test" (file tồn tại, HTTP 200) chứ không phải "đúng về UX". TC-9.1.2 chỉ check HTTP status, không check visual content | Test coverage gap: structural check ≠ UX check |
+
+### Pattern chung — nguồn gốc tổng quát
+
+Cả 3 bugs xuất phát từ cùng một gap: **"automated test pass" ≠ "behavior đúng trên device"**
+
+1. **Thiếu behavioral test cho button action**: Test plan verify offline.html hiện đúng, nhưng không có test case "bấm Thử lại → điều gì xảy ra"
+2. **Assume framework behavior không kiểm chứng**: SW logic dựa trên assumption ngầm về Next.js navigation model mà không verify với App Router thực tế
+3. **Exit criteria mang tính structural**: "file tồn tại", "HTTP 200", "header có mặt" — thiếu tiêu chí UX ("user nhìn thấy đúng", "user thao tác → kết quả đúng")
+
+### Lesson learned → áp dụng cho sprint tới
+
+- Manual TCs trong test plan không phải "nice-to-have" — đây là nơi duy nhất bắt được UX bugs
+- Với mọi interactive element (button, link, form): test plan phải có TC cho hành động ("bấm X → Y xảy ra"), không chỉ "X tồn tại"
+- Khi dùng framework mới (Next.js App Router, SW, RSC): phải verify assumption về behavior, không assume từ kinh nghiệm MPA/Pages Router
+
+---
+
+## Nhóm: Bugs đã Fix sau Sprint 9
+
+| # | Bug | Root Cause | Fix | Status |
+|---|---|---|---|---|
+| B-002 | Tạo vòng luôn báo lỗi "Không thể tạo vòng" dù circle INSERT thành công | `createCircleWithFounder` dùng `.insert().select('id').single()` với user-scoped client. INSERT thành công nhưng SELECT bị block bởi RLS `circles_select_member` (yêu cầu `is_circle_member`) — user chưa phải member ngay lúc SELECT vì `circle_members` chưa được insert. `.single()` raise PGRST116, code trả về error | Pre-generate UUID bằng `crypto.randomUUID()` server-side, INSERT với id đó, bỏ `.select().single()` — không cần SELECT lại | FIXED 2026-05-20 |
+
+*Last updated: 2026-05-20 — Bug fix: createCircleWithFounder RLS SELECT race*
 *Maintained by: Master Agent sau mỗi phiên làm việc*

@@ -62,14 +62,26 @@ export async function createCircleWithFounder(
   }
 
   // --- 3. Insert circle ---
-  // Uses anon client: RLS "circles_insert_authenticated" allows this.
-  const { data: circle, error: circleError } = await supabase
-    .from('circles')
-    .insert({ name: parsed.data, created_by: user.id })
-    .select('id')
-    .single();
+  // Pre-generate the UUID so we don't need to SELECT it back after INSERT.
+  //
+  // Why not .insert(...).select('id').single()?
+  //   The SELECT RLS policy "circles_select_member" requires is_circle_member(id,
+  //   auth.uid()), but the founder membership row hasn't been inserted yet at this
+  //   point — so the SELECT returns 0 rows and .single() raises PGRST116, making
+  //   the action appear to fail even though the INSERT succeeded.
+  //
+  // Generating the ID here lets us:
+  //   (a) skip the post-INSERT SELECT entirely, and
+  //   (b) still use the user-scoped client for INSERT so the RLS INSERT policy
+  //       "circles_insert_authenticated" (created_by = auth.uid()) remains the
+  //       DB-layer enforcement layer.
+  const circleId = crypto.randomUUID();
 
-  if (circleError || !circle) {
+  const { error: circleError } = await supabase
+    .from('circles')
+    .insert({ id: circleId, name: parsed.data, created_by: user.id });
+
+  if (circleError) {
     logger.error('[circles] createCircleWithFounder circle insert failed:', circleError?.code);
     return { success: false, error: 'Không thể tạo vòng. Vui lòng thử lại.' };
   }
@@ -79,7 +91,7 @@ export async function createCircleWithFounder(
   const admin = createAdminClient();
   const { error: memberError } = await admin
     .from('circle_members')
-    .insert({ circle_id: circle.id, user_id: user.id, is_active: true });
+    .insert({ circle_id: circleId, user_id: user.id, is_active: true });
 
   if (memberError) {
     logger.error('[circles] createCircleWithFounder member insert failed:', memberError.code);
@@ -87,7 +99,7 @@ export async function createCircleWithFounder(
     return { success: false, error: 'Vòng đã tạo nhưng không thể thêm thành viên. Liên hệ hỗ trợ.' };
   }
 
-  return { success: true, data: { circleId: circle.id } };
+  return { success: true, data: { circleId } };
 }
 
 // ---------------------------------------------------------------------------
