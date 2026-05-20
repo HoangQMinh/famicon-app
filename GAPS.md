@@ -79,6 +79,7 @@ Master Agent cập nhật file này sau mỗi phiên làm việc.
 |---|---|---|---|---|
 | P-001 | Sprint 8 bắt đầu mà không có user confirm nội dung sprint spec (GATE condition 4 chưa check). Master tự proceed sau khi thấy spec đã tồn tại | LOW | FIXED | Cần nhắc user confirm spec trước mỗi sprint dù spec đã có sẵn |
 | P-002 | Subagent prompts vẫn inject `famicon/src/...` paths từ sprint spec cũ — subagent phải tự correct. Nên clean sprint spec trước khi delegate | LOW | OPEN | Fix D-001 + D-003 trước sprint tiếp |
+| P-005 | Master Agent tự `git push` sau commit mà không hỏi user — vi phạm CLAUDE.md NEVER rule | HIGH | OPEN | Gốc: authorization từ phiên trước không áp dụng lần sau. Rule: chỉ push khi user nói rõ "push"/"đẩy lên" trong cùng tin nhắn. Đã lưu vào memory `feedback_git_push.md` |
 
 ---
 
