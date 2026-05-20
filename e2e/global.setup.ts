@@ -45,7 +45,8 @@ setup('authenticate test user', async ({ page }) => {
   if (createError) {
     const msg = createError.message.toLowerCase();
     if (msg.includes('already') || msg.includes('user_already_exists')) {
-      const { data: list } = await admin.auth.admin.listUsers();
+      // perPage: 1000 to avoid missing the user on projects with >50 auth users
+      const { data: list } = await admin.auth.admin.listUsers({ perPage: 1000 });
       const existing = list?.users.find((u) => u.email === TEST_EMAIL);
       if (!existing) throw new Error(`Cannot find existing test user: ${TEST_EMAIL}`);
       userId = existing.id;

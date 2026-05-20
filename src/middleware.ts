@@ -69,6 +69,13 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse;
   }
 
+  // /auth/callback — PKCE code exchange must be accessible regardless of auth state.
+  // Without this exception, authenticated users following a magic link would be
+  // redirected to /home (AUTH_ONLY_ROUTES match) before the code exchange runs.
+  if (pathname === '/auth/callback') {
+    return supabaseResponse;
+  }
+
   // Unauthenticated user trying to access a protected route → send to /auth
   if (!user && matchesAny(pathname, PROTECTED_ROUTES)) {
     const loginUrl = request.nextUrl.clone();

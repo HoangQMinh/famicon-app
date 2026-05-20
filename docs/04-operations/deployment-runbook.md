@@ -275,5 +275,69 @@ Xem runtime error:
 
 ---
 
+---
+
+## 9. E2E Test Setup (Playwright Authenticated Suite)
+
+### Yêu cầu để chạy authenticated suite local
+
+Trước khi chạy `npm run test:e2e`, cần có đủ 3 env vars sau trong `.env.local`:
+
+```
+E2E_TEST_EMAIL=<email của test user trong Supabase Auth>
+E2E_TEST_CIRCLE_ID=<UUID của circle mà test user thuộc về>
+PLAYWRIGHT_BASE_URL=http://localhost:3000
+```
+
+### Cách lấy E2E_TEST_EMAIL
+
+Dùng email của user có sẵn trong Supabase Auth. Xem danh sách tại:
+Supabase Dashboard → **Authentication** → **Users**
+
+### Cách lấy E2E_TEST_CIRCLE_ID
+
+Chạy trong Supabase SQL Editor:
+```sql
+SELECT circle_id FROM circle_members
+WHERE user_id = (
+  SELECT id FROM auth.users WHERE email = 'your-email@example.com'
+) LIMIT 1;
+```
+
+### Chạy suite
+
+```bash
+# No-auth suite (không cần E2E vars — chỉ cần dev server running)
+npm run test:e2e:no-auth
+
+# Authenticated suite (cần 3 E2E vars đã set)
+npm run test:e2e
+
+# Chỉ authenticated project (không chạy no-auth)
+npx playwright test --project=setup --project=authenticated
+```
+
+### global.setup.ts — Auth bypass mechanism
+
+`e2e/global.setup.ts` sử dụng SERVICE_ROLE_KEY để:
+1. Tìm/tạo test user với email `E2E_TEST_EMAIL` (email_confirm: true)
+2. Set password tạm thời (chỉ dùng cho E2E)
+3. Upsert profile + circle membership
+4. Sign in via `signInWithPassword` → inject cookie dùng `@supabase/ssr` format
+5. Navigate `/home` để verify session → save `playwright/.auth/user.json`
+
+Authenticated tests tái dùng session này — không cần OTP mỗi lần.
+
+### CI pipeline
+
+`.github/workflows/ci.yml` chỉ chạy **no-auth suite** trong CI.
+Authenticated suite yêu cầu live Supabase data → chạy local only.
+GitHub Secrets cần add trước khi CI chạy:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+---
+
 *Tạo: 2026-05-17 | Maintain bởi Docs Steward Agent*
+*Last updated: 2026-05-20 — Sprint 10: thêm Section 9 E2E Test Setup*
 *Liên quan: `docs/03-technical/adr/ADR-001-stack.md`, `docs/04-operations/incident-playbook.md`*

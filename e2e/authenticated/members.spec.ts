@@ -14,7 +14,7 @@ test.describe('Members page (TC-9.7.2)', () => {
     await expect(page.locator('body')).toBeVisible();
   });
 
-  test('shows empty state when user is the only member', async ({ page }) => {
+  test('InviteCTA is always visible on members page', async ({ page }) => {
     await page.goto(`/circles/${CIRCLE_ID}/members`);
     await page.waitForLoadState('domcontentloaded');
 
