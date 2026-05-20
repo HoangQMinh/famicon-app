@@ -42,13 +42,6 @@ playwright/report/
 
 .vercel
 
-# local-only files (not in repo)
-e2e/
-mvp-roadmap-v1.md
-product-discovery-v3.md
-supabase/migrations/20260520000001_is_email_registered_rpc.sql
+# tool configs (local-only, not project content)
 .claude/
 .rtk/
-CLAUDE.md
-PROJECT_STATE.md
-docs/
