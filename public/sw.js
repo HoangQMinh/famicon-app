@@ -7,6 +7,7 @@ const CACHE_NAME = 'fc-shell-v1';
 
 // Shell assets to pre-cache on install
 const SHELL_ASSETS = [
+  '/',
   '/offline.html',
   '/icon-192.png',
   '/manifest.json',
