@@ -5,11 +5,12 @@ import { test, expect } from '@playwright/test';
 test.describe('Home page', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/home');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.locator('.top-header')).toBeVisible({ timeout: 8_000 });
   });
 
   test('top header is visible (TC-9.7.1)', async ({ page }) => {
-    await expect(page.locator('.top-header')).toBeVisible();
+    await expect(page.locator('.top-header')).toBeVisible({ timeout: 5_000 });
   });
 
   test('shows feed or empty state (TC-9.7.1)', async ({ page }) => {

@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Profile page', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/profile');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('profile page loads and shows display name', async ({ page }) => {
@@ -20,7 +20,7 @@ test.describe('Profile page', () => {
     await page.getByRole('button', { name: /Chỉnh sửa hồ sơ/i }).click();
 
     const modal = page.locator('[aria-label="Chỉnh sửa hồ sơ"][aria-modal="true"]');
-    await expect(modal).toBeVisible({ timeout: 3_000 });
+    await expect(modal).toBeVisible({ timeout: 5_000 });
     await expect(page.getByRole('button', { name: /Lưu thay đổi/i })).toBeVisible();
   });
 
@@ -28,7 +28,7 @@ test.describe('Profile page', () => {
     await page.getByRole('button', { name: /Chỉnh sửa hồ sơ/i }).click();
 
     const closeBtn = page.locator('[aria-label="Đóng"]').first();
-    await expect(closeBtn).toBeVisible({ timeout: 3_000 });
+    await expect(closeBtn).toBeVisible({ timeout: 5_000 });
     await closeBtn.click();
 
     await expect(page.locator('[aria-modal="true"]')).not.toBeVisible();

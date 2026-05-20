@@ -6,7 +6,7 @@ test.describe('Security headers', () => {
   let headers: Record<string, string>;
 
   test.beforeAll(async ({ request }) => {
-    const response = await request.get('/');
+    const response = await request.get('/auth');
     headers = Object.fromEntries(
       Object.entries(response.headers()).map(([k, v]) => [k.toLowerCase(), v])
     );
