@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-05-20
 **Current phase:** Phase 4 — Build MVP
-**Current sprint:** Sprint 10 (NEXT)
-**Days into phase:** Sprint 9 DONE
+**Current sprint:** Sprint 11 (NEXT)
+**Days into phase:** Sprint 10 DONE (conditional — pending manual 5-flow verify + CI green after push)
 
 ---
 
@@ -722,7 +722,46 @@ Chi tiết xem `docs/00-foundation/open-questions.md`.
 
 ---
 
-### Sprint 10 (NEXT)
+### Sprint 10 — E2E Testing + Bug Fix (DONE — 2026-05-20) ✅
+
+**Goal:** Tất cả E2E tests pass local, CI pipeline xanh, 5 core flows verified.
+
+**Tasks:**
+- [x] global.setup.ts rewrite — password-based auth + @supabase/ssr cookie injection
+- [x] No-auth suite: 12/12 pass (auth-page, pwa-assets, security-headers)
+- [x] Authenticated suite: 31/31 pass (home, new-request, profile, members, accessibility, middleware)
+- [x] B-003 fix — GRANT SELECT + write ops cho 10 tables (migration 20260520000002)
+- [x] T-006 fix — vitest.config.ts exclude e2e/**
+- [x] .github/workflows/ci.yml — jobs: unit + e2e-no-auth
+- [x] /auth/callback route + middleware exemption
+- [x] deployment-runbook.md — Section 9 E2E Test Setup
+- [x] Vitest regression: 453/0
+
+**Completion Reports:**
+- [x] @tester — PARTIAL→DONE (B-003 escalated + resolved)
+- [x] @architect — DONE
+- [x] @backend — DONE (B-003 + T-006 fixes)
+
+**Reviewer Verdict:**
+- [x] APPROVED ✅ — 2026-05-20 (conditional on manual flows + CI after push)
+
+**Pending (user action required):**
+- [ ] TC-10.3 — 5 core flows manual verify trên desktop Chrome
+- [ ] TC-10.4 — CI pipeline green sau khi push lên GitHub remote
+
+**Key fixes:**
+- B-003 CRITICAL: Missing `GRANT SELECT ON circle_members TO authenticated` — applied to Supabase via Management API
+- global.setup.ts: magic link implicit flow → password-based auth (signInWithPassword + @supabase/ssr cookie)
+- middleware.spec.ts: `browser.newContext()` trong authenticated project kế thừa storageState — fix bằng explicit `{ cookies: [], origins: [] }`
+
+**Notes:**
+- `stringToBase64URL` từ `@supabase/ssr` là internal API — nếu upgrade @supabase/ssr cần verify vẫn exported
+- Dedicated E2E test account (không phải real user) là best practice — backlog Sprint 11
+- Reviewer suggestions for Sprint 11 backlog: `/circles` middleware test, cache-dependency-path in CI
+
+---
+
+### Sprint 11 (NEXT)
 
 ---
 
