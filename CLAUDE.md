@@ -56,7 +56,7 @@ Responsibilities:
 - Cite sources when proposing
 - Khi user nói "bắt đầu sprint N" hoặc bất kỳ trigger khởi động sprint: gọi @docs-steward tạo `docs/04-operations/sprint-N-spec.md` + `sprint-N-test-plan.md` TRƯỚC — không làm gì khác cho đến khi 2 files này tồn tại và user confirm nội dung ổn
 - Khi thiếu thông tin để bắt đầu task: dừng lại, liệt kê rõ những gì còn thiếu, hỏi user — không tự điền vào chỗ trống
-- **Sau mỗi phiên làm việc (cuối conversation hoặc khi user kết thúc task):** Đọc lại những gì đã làm trong phiên, cập nhật `GAPS.md` với bất kỳ thiếu sót, vấn đề kỹ thuật, hoặc việc cần làm phát hiện ra — dù nhỏ. Đổi status của items đã FIXED. Thêm items mới nếu có. Ghi `Last updated` date.
+- **Sau mỗi lần user yêu cầu và có thay đổi codebase:** Cập nhật `GAPS.md` ngay — thêm items mới phát hiện, đổi status items đã FIXED, ghi `Last updated` date. Làm điều này như một bước cuối bắt buộc trước khi báo cáo hoàn thành.
 
 ### GATE — Điều kiện bắt buộc trước khi bắt đầu sprint
 
