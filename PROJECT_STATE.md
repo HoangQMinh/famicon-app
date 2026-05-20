@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-05-18
 **Current phase:** Phase 4 — Build MVP
-**Current sprint:** Sprint 8 — Profile + Members (NEXT)
-**Days into phase:** Sprint 7 DONE
+**Current sprint:** Sprint 9 (NEXT)
+**Days into phase:** Sprint 8 DONE
 
 ---
 
@@ -632,7 +632,52 @@ Chi tiết xem `docs/00-foundation/open-questions.md`.
 
 ---
 
-### Sprint 8 — Profile + Members (NEXT)
+### Sprint 8 — Profile + Members (DONE — 2026-05-20) ✅
+
+**Goal:** User xem và chỉnh sửa hồ sơ; xem danh sách thành viên vòng.
+
+**Tasks:**
+- [x] Migration: fix `notification_logs` CHECK constraint (thêm `join_request`, `new_member`)
+- [x] Verify profiles RLS policies (3 policies confirmed)
+- [x] Verify Storage avatars RLS (INSERT own folder, SELECT public)
+- [x] `uploadAvatar` Server Action — validate file type/size, upload to `{userId}/avatar.webp`, update profile
+- [x] `getMyProfile` Server Action — return ProfileData, no PII leak
+- [x] `getCircleMembers` Server Action — no `line_user_id`, order by `joined_at ASC`
+- [x] Zod schemas: `avatarUploadSchema`, `membersQuerySchema`, `profileUpdateSchema` with help_tags
+- [x] `ProfileData` + `MemberProfile` types (no counter, no badge, no line_user_id)
+- [x] `/profile` page — Server Component, skeleton, error boundary
+- [x] `ProfileClient` — avatar, name, location, kids_desc, help_tags chips
+- [x] `EditProfileModal` — avatar upload preview, form, sequential upload→update
+- [x] `HelpTagsPicker` — 5 chips multi-select
+- [x] `/circles/[id]/members` page — Server Component, skeleton, error boundary
+- [x] `MembersClient` — list với InviteCTA, empty state, no BottomNav
+- [x] `MemberRow` — avatar, name, location, kids_desc, help_tags, chat icon disabled (OQ-007)
+- [x] `InviteCTA` — dashed button → `/invite`
+- [x] BottomNav tab "Hồ sơ" wired, middleware protects `/circles`
+- [x] Test suite: 59 tests Sprint 8 / 453 total — all pass
+
+**Completion Reports:**
+- [x] @schema — APPROVED ✅
+- [x] @backend — APPROVED ✅
+- [x] @frontend — APPROVED ✅
+- [x] @tester — APPROVED ✅
+
+**Reviewer Notes (backlog Sprint 9 Polish):**
+- `edit-profile-modal.tsx`: `newAvatarUrl` intent cần clarify (doc hoặc pass vào updateData)
+- `edit-profile-modal.tsx`: URL.createObjectURL memory leak — revoke on change/close
+- `edit-profile-modal.tsx`: reset `isSubmitting` trước setTimeout
+- `_currentUserId` + `_circleId` props unused — xem xét remove
+- Focus trap cho edit modal
+
+**Notes quan trọng:**
+- Chat icon trên MemberRow: disabled (OQ-007 OPEN — LINE handoff from members screen = Phase 5 scope)
+- Storage SELECT là public — privacy enforced ở app layer qua `profiles_select_circle_member` RLS
+- Policy name: `profiles_select_circle_member` (không phải `profiles_select_same_circle` như trong spec)
+- `help_tags` là `text[]` ở DB — render bất kỳ string, chỉ strict enum khi write (Zod)
+
+---
+
+### Sprint 9 (NEXT)
 
 ---
 
