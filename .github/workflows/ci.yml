@@ -1,0 +1,63 @@
+name: CI
+
+# NOTE: Authenticated E2E suite is excluded from CI.
+# Reason: requires live Supabase test data (E2E_TEST_EMAIL + E2E_TEST_CIRCLE_ID).
+# Run locally with: npm run test:e2e (after setting env vars in .env.local)
+# Will be automated in CI when Supabase seed script is available (Sprint 11+).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  unit:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run test
+
+  e2e-no-auth:
+    name: E2E (no-auth)
+    runs-on: ubuntu-latest
+    needs: [unit]
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      PLAYWRIGHT_BASE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      - run: npm run build
+
+      - run: npm run test:e2e:no-auth
+        env:
+          CI: true
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright/report/
+          retention-days: 7

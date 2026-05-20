@@ -46,6 +46,14 @@ Master Agent cập nhật file này sau mỗi phiên làm việc.
 
 ---
 
+## Nhóm: Backend — Blocking Bugs (Sprint 10)
+
+| # | Vấn đề | Mức | Status | Ghi chú |
+|---|---|---|---|---|
+| B-003 | Migration `20260517000002_rls_policies.sql` thiếu `GRANT SELECT ON circle_members TO authenticated`. RLS policy `profiles_select_circle_member` JOIN trực tiếp `circle_members` mà không qua SECURITY DEFINER function → PostgREST trả 42501 "permission denied for table circle_members" với mọi user-scoped JWT. Hệ quả: `/home`, `/profile`, `/new-request`, `/circles/[id]/members` đều redirect đến `/onboarding` hoặc throw error boundary. | CRITICAL | FIXED | 2026-05-20: Migration `20260520000002_grant_table_permissions.sql` tạo xong — GRANT SELECT + write ops cho tất cả 10 tables. Cần apply lên Supabase (push migration hoặc SQL editor) trước khi Playwright chạy. |
+
+---
+
 ## Nhóm: Backend — Documentation
 
 | # | Vấn đề | Mức | Status | Ghi chú |
@@ -62,6 +70,8 @@ Master Agent cập nhật file này sau mỗi phiên làm việc.
 | T-002 | RLS tests (`rls/profiles.test.ts`, `rls/help-offers.test.ts`, etc.) là mock-based — không validate SQL policy thực. Cần chạy trên real Supabase local trước khi deploy production | MEDIUM | OPEN | Cần `supabase db reset` + chạy test suite trên local instance |
 | T-003 | `notification-type-fix.test.ts`: `urgent_request` và `invite_reminder` chỉ verify qua living-spec constant, không có `simulateNotificationInsert` call thực | LOW | BACKLOG | Thêm 2 test cases vào sprint tiếp |
 | T-004 | `rls/profiles.test.ts`: assertion `count = 0` cho blocked UPDATE là mock-only — real Supabase không return `count` trừ khi query có `{ count: 'exact' }` | LOW | BACKLOG | Thêm comment giải thích |
+| T-005 | `e2e/global.setup.ts` ban đầu dùng magic link implicit flow → luôn timeout. Đã fix bằng password-based approach (set password qua admin API, signInWithPassword, inject cookie bằng `stringToBase64URL` từ `@supabase/ssr`). Setup hiện pass. | HIGH | FIXED | 2026-05-20: Sprint 10 — `global.setup.ts` rewritten |
+| T-006 | Vitest glob vô tình include `e2e/**/*.spec.ts` → 9 Playwright test suites bị vitest pick up và fail với "Playwright Test did not expect test.describe()". Không ảnh hưởng đến 453 unit tests (pass/fail = 453/0). | LOW | FIXED | 2026-05-20: `vitest.config.ts` thêm `exclude: ['e2e/**', 'node_modules/**']`. Verified: vitest run → 453 pass / 0 fail. |
 
 ---
 
@@ -134,5 +144,5 @@ Cả 3 bugs xuất phát từ cùng một gap: **"automated test pass" ≠ "beha
 |---|---|---|---|---|
 | B-002 | Tạo vòng luôn báo lỗi "Không thể tạo vòng" dù circle INSERT thành công | `createCircleWithFounder` dùng `.insert().select('id').single()` với user-scoped client. INSERT thành công nhưng SELECT bị block bởi RLS `circles_select_member` (yêu cầu `is_circle_member`) — user chưa phải member ngay lúc SELECT vì `circle_members` chưa được insert. `.single()` raise PGRST116, code trả về error | Pre-generate UUID bằng `crypto.randomUUID()` server-side, INSERT với id đó, bỏ `.select().single()` — không cần SELECT lại | FIXED 2026-05-20 |
 
-*Last updated: 2026-05-20 — Bug fix: createCircleWithFounder RLS SELECT race*
+*Last updated: 2026-05-20 — Sprint 10: B-003 FIXED (migration 20260520000002_grant_table_permissions.sql); T-006 FIXED (vitest exclude e2e/**); auth/callback route.ts verified (PKCE OK, unauthenticated-only concern noted but acceptable)*
 *Maintained by: Master Agent sau mỗi phiên làm việc*

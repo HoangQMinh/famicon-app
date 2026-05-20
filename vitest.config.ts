@@ -11,6 +11,10 @@ export default defineConfig({
     isolate: true,
     // Global test APIs (describe, it, expect) — avoids importing from vitest in every file.
     globals: true,
+    // Exclude Playwright E2E spec files — they use Playwright's test runner, not Vitest.
+    // Without this, Vitest picks up e2e/**/*.spec.ts and fails with
+    // "Playwright Test did not expect test.describe()" (T-006).
+    exclude: ['e2e/**', 'node_modules/**'],
     // Coverage via v8 (no instrumentation overhead)
     coverage: {
       provider: 'v8',
