@@ -718,7 +718,7 @@ Chi tiết xem `docs/00-foundation/open-questions.md`.
 **Notes:**
 - Code committed: `0243ce5 feat: Sprint 8-9`, follow-up fixes `eca7bda`, `0be5048`, `3c1120b`, `fc1cbef`
 - Next.js 15: 3 auth pages wrapped in Suspense (Next.js 15 requirement for useSearchParams)
-- Security headers live-verified on https://famicon-psi.vercel.app/ ✅
+- Security headers live-verified on https://famicon-app.vercel.app/ ✅
 
 ---
 

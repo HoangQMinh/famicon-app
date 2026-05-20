@@ -23,7 +23,7 @@ export interface CircleInvite {
 }
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? 'https://famicon.vercel.app';
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://famicon-app.vercel.app';
 
 // ---------------------------------------------------------------------------
 // Helpers
