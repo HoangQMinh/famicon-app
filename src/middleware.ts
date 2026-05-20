@@ -5,6 +5,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 const PROTECTED_ROUTES = [
   '/home',
   '/circle',
+  '/circles',   // includes /circles/[id]/members (Sprint 8)
   '/requests',
   '/new-request',
   '/profile',

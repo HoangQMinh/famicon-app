@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, useTransition } from 'react';
+import { Suspense, useState, useEffect, useRef, useCallback, useTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { signInWithEmail, verifyOtp } from '@/app/actions/auth';
@@ -16,7 +16,7 @@ function formatCountdown(seconds: number): string {
   return `${mm}:${ss}`;
 }
 
-export default function OtpVerifyPage() {
+function OtpVerifyContent() {
   const searchParams = useSearchParams();
   const email = searchParams.get('email') ?? '';
   // invite_token is preserved through /auth → /auth/verify to complete join flow
@@ -290,5 +290,13 @@ export default function OtpVerifyPage() {
         </button>
       </div>
     </main>
+  );
+}
+
+export default function OtpVerifyPage() {
+  return (
+    <Suspense fallback={<main className="auth-page" />}>
+      <OtpVerifyContent />
+    </Suspense>
   );
 }

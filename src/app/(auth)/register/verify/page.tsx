@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, useTransition } from 'react';
+import { Suspense, useState, useEffect, useRef, useCallback, useTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { signUpWithEmail, verifyOtp } from '@/app/actions/auth';
@@ -15,7 +15,7 @@ function formatCountdown(seconds: number): string {
   return `${mm}:${ss}`;
 }
 
-export default function RegisterVerifyPage() {
+function RegisterVerifyContent() {
   const searchParams = useSearchParams();
   const email = searchParams.get('email') ?? '';
 
@@ -269,5 +269,13 @@ export default function RegisterVerifyPage() {
         </button>
       </div>
     </main>
+  );
+}
+
+export default function RegisterVerifyPage() {
+  return (
+    <Suspense fallback={<main className="auth-page" />}>
+      <RegisterVerifyContent />
+    </Suspense>
   );
 }

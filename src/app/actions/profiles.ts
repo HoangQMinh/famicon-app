@@ -2,8 +2,8 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/server-admin';
-import { profileCreateSchema, profileUpdateSchema } from '@/lib/schemas/profiles';
-import type { ActionResult } from '@/lib/types';
+import { profileCreateSchema, profileUpdateSchema, avatarUploadSchema } from '@/lib/schemas/profiles';
+import type { ActionResult, ProfileData } from '@/lib/types';
 import { logger } from '@/lib/logger';
 
 // ---------------------------------------------------------------------------
@@ -223,4 +223,152 @@ export async function updateProfile(
   }
 
   return { success: true, data: { updated: true } };
+}
+
+// ---------------------------------------------------------------------------
+// uploadAvatar
+// ---------------------------------------------------------------------------
+
+/**
+ * Uploads an avatar image to Supabase Storage for the authenticated user.
+ *
+ * Security notes:
+ *   - Upload path is always computed server-side from user.id — client cannot
+ *     influence the storage path (prevents overwriting other users' avatars).
+ *   - File type and size are validated via Zod before the upload attempt.
+ *   - Public URL is retrieved after upload and stored in profiles.avatar_url.
+ *
+ * Flow:
+ *   1. Auth guard
+ *   2. Validate file metadata (size, type) via avatarUploadSchema
+ *   3. Upload to storage bucket 'avatars' at '{user.id}/avatar.webp' (upsert)
+ *   4. Get public URL
+ *   5. UPDATE profiles.avatar_url
+ *   6. Return { avatar_url }
+ */
+export async function uploadAvatar(
+  file: File
+): Promise<ActionResult<{ avatar_url: string }>> {
+  // --- 1. Auth guard ---
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return { success: false, error: 'Bạn cần đăng nhập.' };
+  }
+
+  // --- 2. Validate file metadata ---
+  const metaValidation = avatarUploadSchema.safeParse({
+    file_size: file.size,
+    file_type: file.type,
+  });
+
+  if (!metaValidation.success) {
+    const firstError =
+      Object.values(metaValidation.error.flatten().fieldErrors).flat()[0] ??
+      'Thông tin file không hợp lệ.';
+    // Map schema error messages to the user-friendly variants required by spec
+    if (firstError.includes('lớn') || firstError.includes('2MB')) {
+      return { success: false, error: 'File quá lớn. Vui lòng chọn ảnh dưới 2MB.' };
+    }
+    return { success: false, error: 'Định dạng file không được hỗ trợ.' };
+  }
+
+  // --- 3. Upload to storage ---
+  // Path is always server-computed from user.id — never from client input.
+  const storagePath = `${user.id}/avatar.webp`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('avatars')
+    .upload(storagePath, file, {
+      upsert: true,
+      contentType: file.type,
+    });
+
+  if (uploadError) {
+    logger.error('[profiles] uploadAvatar storage upload failed:', uploadError.message);
+    return { success: false, error: 'Không thể tải ảnh lên. Vui lòng thử lại.' };
+  }
+
+  // --- 4. Get public URL ---
+  const { data: urlData } = supabase.storage
+    .from('avatars')
+    .getPublicUrl(storagePath);
+
+  const publicUrl = urlData.publicUrl;
+
+  // --- 5. Update profile ---
+  const { error: updateError } = await supabase
+    .from('profiles')
+    .update({ avatar_url: publicUrl })
+    .eq('id', user.id);
+
+  if (updateError) {
+    logger.error('[profiles] uploadAvatar profile update failed:', updateError.code);
+    return { success: false, error: 'Không thể tải ảnh lên. Vui lòng thử lại.' };
+  }
+
+  return { success: true, data: { avatar_url: publicUrl } };
+}
+
+// ---------------------------------------------------------------------------
+// getMyProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns the authenticated user's own profile.
+ *
+ * Privacy notes:
+ *   - line_user_id is intentionally excluded from the SELECT — must never
+ *     be returned to the client (Constitution Principle 9).
+ *   - RLS policy "profiles_select_self" allows the user to read their own row.
+ *
+ * Flow:
+ *   1. Auth guard
+ *   2. SELECT profile row excluding line_user_id
+ *   3. Return ProfileData
+ */
+export async function getMyProfile(): Promise<ActionResult<ProfileData>> {
+  // --- 1. Auth guard ---
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return { success: false, error: 'Bạn cần đăng nhập.' };
+  }
+
+  // --- 2. SELECT profile — line_user_id intentionally excluded (Constitution P9) ---
+  const { data: profile, error: fetchError } = await supabase
+    .from('profiles')
+    .select('id, display_name, avatar_emoji, avatar_url, location, kids_desc, help_tags')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (fetchError) {
+    logger.error('[profiles] getMyProfile fetch failed:', fetchError.code);
+    return { success: false, error: 'Không tìm thấy hồ sơ. Vui lòng thử lại.' };
+  }
+
+  if (!profile) {
+    return { success: false, error: 'Không tìm thấy hồ sơ. Vui lòng thử lại.' };
+  }
+
+  return {
+    success: true,
+    data: {
+      id: profile.id,
+      display_name: profile.display_name,
+      avatar_emoji: profile.avatar_emoji ?? null,
+      avatar_url: profile.avatar_url ?? null,
+      location: profile.location ?? null,
+      kids_desc: profile.kids_desc ?? null,
+      help_tags: profile.help_tags ?? null,
+    },
+  };
 }

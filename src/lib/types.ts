@@ -7,6 +7,46 @@ export type ActionResult<T = null> =
   | { success: false; error: string };
 
 // ---------------------------------------------------------------------------
+// Profile types (Sprint 8)
+// ---------------------------------------------------------------------------
+
+/**
+ * Profile data returned by getMyProfile().
+ *
+ * IMPORTANT: line_user_id is intentionally excluded from this type.
+ * It must never be returned to the client (Constitution Principle 9 — privacy).
+ * The server accesses line_user_id internally only (e.g., createOffer deeplink).
+ */
+export type ProfileData = {
+  id: string;
+  display_name: string;
+  avatar_emoji: string | null;
+  avatar_url: string | null;
+  location: string | null;
+  kids_desc: string | null;
+  help_tags: string[] | null;
+};
+
+/**
+ * Member profile shape returned by getCircleMembers().
+ * Same fields as ProfileData — kept as a separate named type for clarity at call sites.
+ *
+ * IMPORTANT: line_user_id is intentionally excluded (Constitution Principle 9).
+ * Contribution counts, offer counts, and any activity counters are also excluded
+ * (Constitution Principle 2 — no ledger).
+ * No admin/founder badge field (Constitution Principle 7).
+ */
+export type MemberProfile = {
+  id: string;
+  display_name: string;
+  avatar_emoji: string | null;
+  avatar_url: string | null;
+  location: string | null;
+  kids_desc: string | null;
+  help_tags: string[] | null;
+};
+
+// ---------------------------------------------------------------------------
 // Aid request types (Sprint 3)
 // ---------------------------------------------------------------------------
 

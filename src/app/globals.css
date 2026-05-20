@@ -2356,3 +2356,407 @@ body {
   width: 100%;
   font-size: var(--font-size-sm);
 }
+
+/* ============================================================
+   SPRINT 8 — PROFILE PAGE
+   ============================================================ */
+
+/* Page layout */
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background-color: var(--bg-app);
+}
+
+.profile-body {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Profile header skeleton placeholder */
+.profile-header--skeleton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--safe-top) + var(--space-3)) var(--space-4) var(--space-3);
+  background-color: var(--color-surface-card);
+  box-shadow: var(--shadow-hairline-bottom);
+  height: calc(var(--safe-top) + 56px);
+}
+
+/* ── Avatar sizes ── */
+
+/* Base avatar — 44px circle, warm beige bg */
+.fc-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background-color: var(--bg-avatar);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  font-size: 22px;
+  line-height: 1;
+}
+
+/* Large avatar — 64px (profile page hero) */
+.fc-avatar--lg {
+  width: 64px;
+  height: 64px;
+  font-size: 32px;
+}
+
+/* ── Pill / chip ── */
+
+.fc-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background-color: var(--bg-chip);
+  color: var(--fg-brand);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+  line-height: var(--line-height-tight);
+  border: 1px solid transparent;
+  cursor: default;
+  white-space: nowrap;
+  transition: background-color var(--duration-fast) var(--ease-soft),
+              border-color var(--duration-fast) var(--ease-soft);
+}
+
+/* Selected state — used in HelpTagsPicker */
+.fc-pill--selected {
+  background-color: var(--color-primary-500);
+  color: var(--fg-on-brand);
+  border-color: var(--color-primary-500);
+  cursor: pointer;
+}
+
+/* When fc-pill is used as a button (HelpTagsPicker) */
+button.fc-pill {
+  cursor: pointer;
+  border: 1.5px solid var(--border-hairline);
+  background-color: var(--bg-card);
+  color: var(--fg-secondary);
+  -webkit-tap-highlight-color: transparent;
+}
+
+button.fc-pill:hover:not(:disabled) {
+  border-color: var(--color-primary-300);
+  background-color: var(--color-primary-50);
+  color: var(--fg-brand);
+}
+
+button.fc-pill:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+button.fc-pill:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.fc-pill--selected {
+  background-color: var(--color-primary-500);
+  color: var(--fg-on-brand);
+  border-color: var(--color-primary-500);
+}
+
+button.fc-pill--selected:hover:not(:disabled) {
+  background-color: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+  color: var(--fg-on-brand);
+}
+
+/* ── InviteCTA dashed border button ── */
+
+.fc-invite {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: 52px;
+  padding: var(--space-3) var(--space-4);
+  background-color: transparent;
+  border: 1.5px dashed var(--border-soft);
+  border-radius: var(--radius-lg);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--fg-secondary);
+  cursor: pointer;
+  transition: border-color var(--duration-base) var(--ease-soft),
+              background-color var(--duration-base) var(--ease-soft),
+              color var(--duration-base) var(--ease-soft);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fc-invite:hover {
+  border-color: var(--color-primary-400);
+  background-color: var(--color-primary-50);
+  color: var(--fg-brand);
+}
+
+.fc-invite:active {
+  transform: scale(0.98);
+}
+
+/* ============================================================
+   SPRINT 8 — EDIT PROFILE MODAL (bottom sheet)
+   ============================================================ */
+
+/* Backdrop overlay */
+.edit-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: var(--color-surface-overlay);
+  z-index: 40;
+  animation: fade-in var(--duration-base) var(--ease-soft);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Bottom sheet */
+.edit-modal__sheet {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 428px;
+  max-height: 92dvh;
+  background-color: var(--bg-card);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slide-up var(--duration-slow) var(--ease-soft);
+}
+
+@keyframes slide-up {
+  from { transform: translateX(-50%) translateY(100%); }
+  to   { transform: translateX(-50%) translateY(0);    }
+}
+
+/* Sheet header */
+.edit-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-4) var(--space-3);
+  border-bottom: 1px solid var(--border-hairline);
+  flex-shrink: 0;
+}
+
+.edit-modal__title {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--fg-primary);
+  margin: 0;
+  line-height: var(--line-height-tight);
+}
+
+.edit-modal__close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--fg-secondary);
+  border-radius: var(--radius-full);
+  margin: -10px -10px -10px 0;
+  transition: color var(--duration-fast) var(--ease-soft),
+              background-color var(--duration-fast) var(--ease-soft);
+  flex-shrink: 0;
+}
+
+.edit-modal__close-btn:hover:not(:disabled) {
+  color: var(--fg-primary);
+  background-color: var(--color-neutral-100);
+}
+
+.edit-modal__close-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Scrollable form body */
+.edit-modal__body {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--space-5) var(--space-4);
+  padding-bottom: calc(var(--safe-bottom) + var(--space-6));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  flex: 1;
+}
+
+/* Avatar section */
+.edit-modal__avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.edit-modal__avatar-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  background-color: var(--bg-avatar);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  box-shadow: var(--shadow-sm);
+}
+
+.edit-modal__avatar-preview .fc-avatar--lg {
+  width: 80px;
+  height: 80px;
+}
+
+.edit-modal__change-avatar-btn {
+  height: 36px;
+  padding: 0 var(--space-3);
+  font-size: var(--font-size-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* Form field wrapper */
+.edit-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Actions row */
+.edit-modal__actions {
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--space-2);
+}
+
+/* ============================================================
+   SPRINT 8 — MEMBERS PAGE
+   ============================================================ */
+
+.members-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background-color: var(--bg-app);
+}
+
+/* Custom header (back + title) — no BottomNav on this screen */
+.members-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: calc(var(--safe-top) + var(--space-3)) var(--space-4) var(--space-3);
+  background-color: var(--color-surface-card);
+  box-shadow: var(--shadow-hairline-bottom);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.members-back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--fg-secondary);
+  flex-shrink: 0;
+  transition: color var(--duration-fast) var(--ease-soft),
+              background-color var(--duration-fast) var(--ease-soft);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.members-back-btn:hover {
+  color: var(--fg-primary);
+  background-color: var(--color-neutral-100);
+}
+
+.members-header__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.members-header__title {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--fg-primary);
+  line-height: var(--line-height-tight);
+  margin: 0;
+}
+
+.members-header__sub {
+  font-size: var(--font-size-xs);
+  color: var(--fg-secondary);
+  line-height: var(--line-height-normal);
+  margin: 0;
+}
+
+/* Members body — scrollable content */
+.members-body {
+  flex: 1;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  overflow-y: auto;
+  padding-bottom: calc(var(--safe-bottom) + var(--space-8));
+}
+
+/* Members list — stacked cards */
+.members-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ============================================================
+   SPRINT 9 — ACCESSIBILITY: FOCUS VISIBLE
+   The @layer base resets outline to none via Tailwind.
+   Re-add focus-visible rings for keyboard navigation (WCAG 2.4.7).
+   ============================================================ */
+
+:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Suppress focus ring for mouse/touch interactions only — browsers
+   that support :focus-visible will show ring only for keyboard nav */
+:focus:not(:focus-visible) {
+  outline: none;
+}

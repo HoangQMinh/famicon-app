@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { Suspense, useState, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signInWithEmail } from '@/app/actions/auth';
 
@@ -9,7 +9,7 @@ function isValidEmailFormat(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
 
-export default function AuthPage() {
+function AuthContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   // Preserve invite_token through the auth flow so verify page can pass it along
@@ -125,5 +125,13 @@ export default function AuthPage() {
         Bạn chưa có lời mời? Hỏi người thân trong vòng.
       </p>
     </main>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<main className="auth-page" />}>
+      <AuthContent />
+    </Suspense>
   );
 }

@@ -16,7 +16,7 @@ export function Fab() {
     <Link
       href="/new-request"
       className="fab"
-      aria-label="Nhờ giúp"
+      aria-label="Đăng nhờ giúp"
     >
       {/* Plus icon */}
       <svg

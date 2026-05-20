@@ -1,11 +1,11 @@
 {
-  "name": "FAMICON — Vòng Tròn Tương Trợ",
-  "short_name": "FAMICON",
+  "name": "Vòng Tròn Tương Trợ",
+  "short_name": "Vòng Tròn",
   "description": "Ứng dụng kết nối gia đình Việt tại Nhật",
-  "start_url": "/",
+  "start_url": "/home",
   "display": "standalone",
-  "background_color": "#FAF8F5",
-  "theme_color": "#FF8966",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
   "orientation": "portrait",
   "icons": [
     {
