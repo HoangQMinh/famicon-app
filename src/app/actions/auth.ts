@@ -81,10 +81,7 @@ async function isEmailAllowed(email: string): Promise<boolean> {
 
   if (invite) return true;
 
-  // Check 2: email has an accepted invite (i.e. is an existing member).
-  // We avoid auth.users entirely — getUserByEmail does not exist in supabase-js v2.
-  // circle_invites.status = 'accepted' is set when the user completes onboarding,
-  // which is the reliable proxy for "this email already has an account here".
+  // Check 2: email has an accepted invite (i.e. joined via invite flow).
   const { data: acceptedInvite } = await admin
     .from('circle_invites')
     .select('id')
@@ -92,7 +89,26 @@ async function isEmailAllowed(email: string): Promise<boolean> {
     .eq('status', 'accepted')
     .maybeSingle();
 
-  return acceptedInvite !== null;
+  if (acceptedInvite) return true;
+
+  // Check 3: email exists in auth.users — covers users who registered via any
+  // path that does NOT create a circle_invites row:
+  //   - Open registration (/register page, no invite)
+  //   - Circle founder (createCircleWithFounder — only writes circle_members)
+  //   - Join request accepted (acceptJoinRequest — only writes circle_members)
+  //
+  // is_email_registered() is a SECURITY DEFINER RPC that reads auth.users.
+  // Requires migration 20260520000001_is_email_registered_rpc.sql to be applied.
+  const { data: registered, error: rpcError } = await admin
+    .rpc('is_email_registered', { p_email: email });
+
+  if (rpcError) {
+    logger.error('[auth] is_email_registered RPC failed:', rpcError.code);
+    // Fail-open: if the RPC is unavailable, don't block an existing user.
+    return false;
+  }
+
+  return registered === true;
 }
 
 /**
