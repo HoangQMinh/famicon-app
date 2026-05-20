@@ -342,7 +342,7 @@ body {
 }
 
 .auth-heading-highlight {
-  color: var(--color-primary-500);
+  color: var(--color-primary-800);
 }
 
 .auth-subtext {
@@ -488,7 +488,7 @@ body {
   align-items: center;
   gap: var(--space-3);
   margin: var(--space-4) 0;
-  color: var(--fg-tertiary);
+  color: var(--fg-secondary);
   font-size: var(--font-size-sm);
 }
 
@@ -502,7 +502,7 @@ body {
 
 .auth-footer-note {
   font-size: var(--font-size-sm);
-  color: var(--fg-tertiary);
+  color: var(--fg-secondary);
   text-align: center;
   line-height: var(--line-height-normal);
 }
