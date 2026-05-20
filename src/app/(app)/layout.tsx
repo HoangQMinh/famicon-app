@@ -1,13 +1,10 @@
 import { BottomNav } from '@/components/layout/bottom-nav';
+import { OfflineDetector } from '@/components/ui/offline-detector';
 
-/**
- * App shell layout — wraps all authenticated app routes.
- * Provides the BottomNav anchored at the bottom (safe-area aware).
- * The main content area is scrollable above the nav.
- */
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="app-shell">
+      <OfflineDetector />
       <main className="app-main">{children}</main>
       <BottomNav />
     </div>

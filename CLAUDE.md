@@ -46,6 +46,7 @@ Responsibilities:
 - Bắt đầu bất kỳ sprint/phase/task nào khi chưa có đủ tài liệu và thông tin cần thiết
 - Đoán, giả định, hoặc tự suy ra thông tin còn thiếu — phải hỏi user hoặc tạo tài liệu trước
 - Delegate subagent khi sprint spec chưa tồn tại tại `docs/04-operations/sprint-N-spec.md`
+- **`git push` hoặc bất kỳ hành động nào đẩy code lên remote** — kể cả trong subagent — trừ khi user nói rõ "push" hoặc "đẩy lên git"
 
 ### ALWAYS
 

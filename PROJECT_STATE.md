@@ -1,9 +1,9 @@
 # PROJECT_STATE.md
 
-**Last updated:** 2026-05-18
+**Last updated:** 2026-05-20
 **Current phase:** Phase 4 — Build MVP
-**Current sprint:** Sprint 9 (NEXT)
-**Days into phase:** Sprint 8 DONE
+**Current sprint:** Sprint 10 (NEXT)
+**Days into phase:** Sprint 9 DONE
 
 ---
 
@@ -677,7 +677,52 @@ Chi tiết xem `docs/00-foundation/open-questions.md`.
 
 ---
 
-### Sprint 9 (NEXT)
+### Sprint 9 — Polish + PWA (DONE — 2026-05-20) ✅
+
+**Goal:** App sẵn sàng pilot — PWA installable, offline fallback, security headers, a11y polish.
+
+**Tasks:**
+- [x] PWA manifest hoàn chỉnh (name, short_name, start_url, icons 192+512)
+- [x] PWA icons: icon-192.png, icon-512.png, apple-touch-icon.png
+- [x] offline.html — offline fallback page với Vietnamese message + retry button
+- [x] Service Worker cache shell strategy (fc-shell-v1) — network-first API, cache-first shell, offline fallback
+- [x] Security headers: X-Frame-Options, X-Content-Type-Options, CSP, Referrer-Policy, X-XSS-Protection, Permissions-Policy
+- [x] iOS safe-area insets (`env(safe-area-inset-bottom)`) trong BottomNav, FAB, main content
+- [x] Loading skeletons verify (home, profile, members, request detail — đã có)
+- [x] Error boundaries verify (home, profile, members, request detail — đã có)
+- [x] Empty states verify (home feed, members page — đã có)
+- [x] Accessibility: FAB aria-label, :focus-visible ring styles, img→Image, aria-disabled→disabled
+- [x] Next.js 14→15 upgrade (build clean)
+- [x] Next.js Image optimization (member-row, profile-client)
+- [x] npm audit: 0 high/critical (2 moderate PostCSS transitive — not actionable)
+- [x] Vitest: 453 pass / 0 fail
+
+**Completion Reports:**
+- [x] @frontend — APPROVED ✅
+- [x] @tester — DONE (automated: all pass; manual: pending device)
+
+**Reviewer Verdict:**
+- [x] APPROVED ✅ — 2026-05-20 (conditional on user device test)
+
+**Reviewer suggestions (backlog Sprint 10+):**
+- manifest.json: split `"purpose": "any maskable"` → separate entries (Safari compatibility)
+- Move inline SW registration → `/register-sw.js` file (allows drop `unsafe-inline` from CSP)
+- Verify `unsafe-eval` not needed in production build — CSP hardening opportunity
+
+**Manual tests pending user (device):**
+- [ ] TC-9.4 — Lighthouse Performance ≥80, Accessibility ≥90 (Chrome DevTools / PageSpeed Insights)
+- [ ] TC-9.2 — SW offline simulation (Chrome DevTools Network > Offline)
+- [ ] TC-9.6 — iOS Add to Home Screen + standalone launch (Safari iOS)
+- [ ] TC-9.6.3 — Safe-area BottomNav not hidden by home indicator
+
+**Notes:**
+- Code committed: `0243ce5 feat: Sprint 8-9`, follow-up fixes `eca7bda`, `0be5048`, `3c1120b`, `fc1cbef`
+- Next.js 15: 3 auth pages wrapped in Suspense (Next.js 15 requirement for useSearchParams)
+- Security headers live-verified on https://famicon-psi.vercel.app/ ✅
+
+---
+
+### Sprint 10 (NEXT)
 
 ---
 

@@ -58,7 +58,7 @@ Master Agent cập nhật file này sau mỗi phiên làm việc.
 
 | # | Vấn đề | Mức | Status | Ghi chú |
 |---|---|---|---|---|
-| T-001 | 6 pre-existing failures trong `auth-invite-gating.test.ts` — Sprint 2 mock issue, không liên quan Sprint 8 | MEDIUM | OPEN | Chưa ai fix. Xem lại trong Sprint 9 |
+| T-001 | 6 pre-existing failures trong `auth-invite-gating.test.ts` — Sprint 2 mock issue | MEDIUM | FIXED | 2026-05-20: Vitest 453/0 pass — 0 failures, đã resolved |
 | T-002 | RLS tests (`rls/profiles.test.ts`, `rls/help-offers.test.ts`, etc.) là mock-based — không validate SQL policy thực. Cần chạy trên real Supabase local trước khi deploy production | MEDIUM | OPEN | Cần `supabase db reset` + chạy test suite trên local instance |
 | T-003 | `notification-type-fix.test.ts`: `urgent_request` và `invite_reminder` chỉ verify qua living-spec constant, không có `simulateNotificationInsert` call thực | LOW | BACKLOG | Thêm 2 test cases vào sprint tiếp |
 | T-004 | `rls/profiles.test.ts`: assertion `count = 0` cho blocked UPDATE là mock-only — real Supabase không return `count` trừ khi query có `{ count: 'exact' }` | LOW | BACKLOG | Thêm comment giải thích |
@@ -82,5 +82,24 @@ Master Agent cập nhật file này sau mỗi phiên làm việc.
 
 ---
 
-*Last updated: 2026-05-20 — Sprint 8 DONE*
+## Nhóm: PWA — Sprint 9 Device Testing (Fixed)
+
+| # | Vấn đề | Mức | Status | Ghi chú |
+|---|---|---|---|---|
+| P-003 | PWA icons placeholder màu cam — apple-touch-icon.png và icon-192.png là solid orange square, không khớp brand | HIGH | FIXED | 2026-05-20: Regenerated thành solid green #16a34a (180×180, 192×192, 512×512). Cần replace bằng icon có design thật trước pilot launch |
+| P-004 | Offline fallback không hiển thị khi tap link trong app (discovery, create circle) — Next.js RSC client-side navigation không có `mode=navigate` nên SW không bắt được | HIGH | FIXED | 2026-05-20: Thêm `OfflineDetector` component vào `(app)/layout.tsx` và `(auth)/layout.tsx` — listen `offline` event, redirect → /offline.html |
+
+---
+
+## Nhóm: PWA / Security — Sprint 9 Backlog
+
+| # | Vấn đề | Mức | Status | Ghi chú |
+|---|---|---|---|---|
+| S-001 | `manifest.json`: `"purpose": "any maskable"` single string — Safari + một số auditor mong separate entries | LOW | BACKLOG | Split trước production launch |
+| S-002 | SW registration inline script (`dangerouslySetInnerHTML` trong `layout.tsx`) là lý do CSP cần `unsafe-inline`. Move → `/register-sw.js` để hardening CSP | MEDIUM | BACKLOG | Sprint 10+ |
+| S-003 | `unsafe-eval` trong CSP — verify có cần thiết trong production build không. Nếu không cần → remove để tightening CSP | MEDIUM | BACKLOG | Test `NODE_ENV=production` build |
+
+---
+
+*Last updated: 2026-05-20 — Sprint 9 DONE*
 *Maintained by: Master Agent sau mỗi phiên làm việc*
