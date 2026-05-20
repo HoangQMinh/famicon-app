@@ -122,7 +122,10 @@ function AuthContent() {
       {/* Divider + footer */}
       <div className="auth-divider" aria-hidden="true">hoặc</div>
       <p className="auth-footer-note">
-        Bạn chưa có lời mời? Hỏi người thân trong vòng.
+        Chưa có tài khoản?{' '}
+        <a href="/register" className="auth-footer-link">
+          Đăng ký ngay
+        </a>
       </p>
     </main>
   );
