@@ -275,6 +275,19 @@ describe('getCircleMembers', () => {
     }
   });
 
+  it('returns empty members array when circle has no active members', async () => {
+    scenario.authUser = USER_A;
+    scenario.callerMembership = { id: 'member-row-a' };
+    scenario.circle = { name: 'Vòng Mới' };
+    scenario.memberRows = [];
+    const result = await getCircleMembers(VALID_CIRCLE_ID);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.members).toHaveLength(0);
+      expect(result.data.circle_name).toBe('Vòng Mới');
+    }
+  });
+
   it('CONSTITUTION: response members do not contain line_user_id', async () => {
     /**
      * WHY CRITICAL: Constitution Principle 9 — line_user_id is PII. Every member
