@@ -2,6 +2,7 @@
 
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server-admin';
 import type { ActionResult } from '@/lib/types';
 import { logger } from '@/lib/logger';
 
@@ -51,9 +52,9 @@ export async function updateDiscoverySettings(
 
   const { is_visible, radius_km } = parsed.data;
 
-  // --- 3. Upsert ---
-  // On conflict (user_id PK): update existing row.
-  const { error: upsertError } = await supabase
+  // --- 3. Upsert (admin client bypasses RLS — auth guard above ensures scope) ---
+  const admin = createAdminClient();
+  const { error: upsertError } = await admin
     .from('user_discovery_settings')
     .upsert(
       { user_id: user.id, is_visible, radius_km },
